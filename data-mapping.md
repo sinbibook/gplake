@@ -385,7 +385,7 @@ E2 도 같은 처리를 해 뒀다. 스타일 규칙은 **494개 전부 이식�
 
 ```
 .header
-├ .hd_inner   — .logo / .hd_right(예약·YBS·모바일 메뉴) / .btn_toggle
+├ .hd_inner   — .logo / .hd_right(네이버·인스타·예약·YBS·모바일 메뉴) / .btn_toggle
 ├ .hd_lnb     — .txt_logo / ul.depth1 / .btn_lnb_close
 └ .aside      — 모바일 슬라이드 메뉴
 ```
@@ -395,16 +395,37 @@ E2 도 같은 처리를 해 뒀다. 스타일 규칙은 **494개 전부 이식�
 
 `header-footer-mapper.js` 는 E2 것을 **수정 없이 그대로 쓴다** (템플릿 공용, 원본 종속 없음).
 
-| `data-*`                            | 요소                                             | JSON 경로                                      | 폴백 / 비고                                                                    |
-| ----------------------------------- | ------------------------------------------------ | ---------------------------------------------- | ------------------------------------------------------------------------------ |
-| `data-logo-image`                   | `.logo img`                                      | `homepage.images[0].logo[isSelected].url`      | 없으면 `img` 숨기고 `.logo_text` 노출 → 그것도 없으면 placeholder              |
-| `data-property-name`                | `.logo .logo_text`, `.hd_lnb .txt_logo a`        | `customFields.property.name` → `property.name` |                                                                                |
-| `data-rooms-submenu`                | ROOMS `.depth_box` / aside `.depth_list`         | `customFields.roomtypes[]`                     | `미리보기` li 뒤에 `data-generated="room"` 으로 추가                           |
-| `data-special-submenu`              | SPECIAL `.depth_box` / aside `.depth_list`       | `property.facilities[]`                        | 컨테이너를 비우고 전량 생성                                                    |
-| `data-booking-link`                 | 헤더 예약 버튼 / RESERVE `depth1_a` / `예약하기` | `property.realtimeBookingId`                   | URL 형태일 때만 `href` 주입, 아니면 `#!` 유지                                  |
-| `data-ybs-button` / `data-ybs-wrap` | `.btn_reserve` (감싼 `span.ybs_wrap`)            | `property.ybsId`                               | 없으면 `span` 째 숨김. 링크는 `https://www.yapen.co.kr/external?ypIdx={ybsId}` |
-| `data-menu-id="layout-map"`         | ROOMS `미리보기` li                              | `pages.layoutMap.sections[0].enabled`          | `false` 면 li 숨김                                                             |
-| `data-travel-menu`                  | TRAVEL `li` / aside 블록                         | `pages.nearbyAttractions.sections[0].enabled`  | `false` 면 숨김                                                                |
+| `data-*`                              | 요소                                             | JSON 경로                                      | 폴백 / 비고                                                                            |
+| ------------------------------------- | ------------------------------------------------ | ---------------------------------------------- | -------------------------------------------------------------------------------------- |
+| `data-logo-image`                     | `.logo img`                                      | `homepage.images[0].logo[isSelected].url`      | 없으면 `img` 숨기고 `.logo_text` 노출 → 그것도 없으면 placeholder                      |
+| `data-property-name`                  | `.logo .logo_text`, `.hd_lnb .txt_logo a`        | `customFields.property.name` → `property.name` |                                                                                        |
+| `data-rooms-submenu`                  | ROOMS `.depth_box` / aside `.depth_list`         | `customFields.roomtypes[]`                     | `미리보기` li 뒤에 `data-generated="room"` 으로 추가                                   |
+| `data-special-submenu`                | SPECIAL `.depth_box` / aside `.depth_list`       | `property.facilities[]`                        | 컨테이너를 비우고 전량 생성                                                            |
+| `data-booking-link`                   | 헤더 예약 버튼 / RESERVE `depth1_a` / `예약하기` | `property.realtimeBookingId`                   | URL 형태일 때만 `href` 주입, 아니면 `#!` 유지                                          |
+| `data-ybs-button` / `data-ybs-wrap`   | `.btn_reserve` (감싼 `span.ybs_wrap`)            | `property.ybsId`                               | 없으면 `span` 째 숨김. 링크는 `https://www.yapen.co.kr/external?ypIdx={ybsId}`         |
+| `data-menu-id="layout-map"`           | ROOMS `미리보기` li                              | `pages.layoutMap.sections[0].enabled`          | `false` 면 li 숨김                                                                     |
+| `data-travel-menu`                    | TRAVEL `li` / aside 블록                         | `pages.nearbyAttractions.sections[0].enabled`  | `false` 면 숨김                                                                        |
+| `data-homepage-socialLinks-blog`      | 헤더 `.hd_sns` / aside `.aside_sns` 네이버 버튼  | `homepage.socialLinks.blog`                    | 없으면(null·빈 문자열·공백·키 없음) 숨김. 둘 다 없으면 래퍼(`data-social-wrap`)째 숨김 |
+| `data-homepage-socialLinks-instagram` | 헤더 `.hd_sns` / aside `.aside_sns` 인스타 버튼  | `homepage.socialLinks.instagram`               | 위와 같음                                                                              |
+
+### 네이버·인스타그램 버튼 (`socialLinks`)
+
+기준 사이트(grangnarang · kalcamping · kia-ora · playbeach) 헤더에는 없는 버튼이라 다른 템플릿과 같은
+"예약하기 앞" 규칙으로 넣었다. 네이버는 어드민 **blog** 칸(네이버 플레이스 주소)을, 인스타그램은 **instagram** 칸을 쓴다.
+
+- **540px 이상**: `.hd_right` 맨 앞 `[N][인스타] 예약하기 YBS ☰`. 예약하기의 특가 배지(`.res_ico`)가 왼쪽으로 10px
+  튀어나와 있어 묶음과 예약하기 사이를 18px 띄운다. 아이콘 32px(≥1024) / 30px(≤1023) / 26px(≤860), 아이콘 사이 8px(≤860 6px).
+  인스타 로고(122×126)는 높이만 고정하고 폭은 비율대로(`width:auto`).
+- **539px 이하**: 헤더 줄에 자리가 없어(YBS 가 꺼진 사이트도 헤더가 두 줄로 늘어난다) 헤더에서는 숨기고
+  **aside 맨 아래**(LOCATION 아래 구분선 + 30px 아이콘 2개)에 보인다.
+- PC 에서는 투명한 `.btn_toggle` 이 로고 오른쪽 헤더 전체를 덮으므로 `.hd_sns` 에 `position:relative; z-index:1`
+  을 줘야 클릭된다(예약하기와 같은 처리).
+- LNB 가 열린 `.header.on` 상태에서는 `.hd_inner` 와 함께 사라진다(예약·YBS 와 같음).
+- 마크업은 링크·래퍼 모두 `style="display: none"` 으로 시작하고 `mapSocialLinks()` 가 값이 있을 때만 `href`
+  (`target=_blank rel=noopener`)를 넣고 노출한다. 매퍼는 `facebook / instagram / blog / youtube` 4종을 처리하고
+  G형 마크업은 blog·instagram 두 개다. 버튼이 하나라도 보이면 루트에 `data-social="on"`, 아니면 `"off"`.
+- 어드민 프리뷰 `section_update` 의 `section === 'socialLinks'` 는 `pages[page].sections[0]` 이 아니라
+  `homepage.socialLinks` 에 반영하고 헤더 버튼만 다시 매핑한다(`handleSocialLinksUpdate`).
 
 ### 서브메뉴 (`.depth_box`)
 
